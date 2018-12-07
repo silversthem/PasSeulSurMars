@@ -1,10 +1,7 @@
+# -*- coding: utf-8 -*
 
 import random
 from math import sqrt
-
-
-
-
 
 def get_closest_ressource(ressources, type, player_coor):
     type2 = 0

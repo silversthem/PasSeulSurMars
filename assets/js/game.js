@@ -74,7 +74,7 @@ function Game(map, player, ressource, token) {
             }
         }
 
-        draw();
+        this.draw();
     }
 
     this.getNearPipes = function(i) {
@@ -205,7 +205,7 @@ function Game(map, player, ressource, token) {
             }
 
             var imgTank = new Image();
-            imgTank.src = "../textures/tank.png";
+            imgTank.src = "../textures/tank.jpg";
             imgTank.onload = function() {
                 for(var x = 0;x < 25;x++) {
                     for(var y = 0;y < 25;y++) {

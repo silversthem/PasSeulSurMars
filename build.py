@@ -6,7 +6,7 @@ db = sqlite3.connect('db.sqlite')
 
 db.execute('''
 CREATE TABLE Player (
-    token int PRIMARY KEY AUTOINCREMENT,
+    token INTEGER PRIMARY KEY AUTOINCREMENT,
     x int,
     y int,
     food int,
@@ -23,14 +23,16 @@ db.commit()
 
 db.execute('''
 CREATE TABLE Object (
-    id int PRIMARY KEY AUTOINCREMENT,
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
     token int,
     x int,
     y int,
     type int,
     attr int,
     FOREIGN KEY(token) REFERENCES Player(token)
-);
+)''')
+
+db.execute('''
 CREATE TABLE Ressource (
     id int PRIMARY KEY,
     token int,

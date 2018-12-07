@@ -9,15 +9,15 @@
     <canvas id="game">
     </canvas>
 
-    <script src="../js/game.js"> </script>
-    <script src="../js/ajax.js"> </script>
+    <script src="/js/game.js"> </script>
+    <script src="/js/ajax.js"> </script>
     <script>
 
-        var game = new Game({{ map }}, {{ player }}, {{ ressource }}, {{ token }});
+        var game = new Game({{ map|safe }}, {{ player|safe }}, {{ ressources|safe }}, {{ token|safe }});
 
         game.createEventListeners();
 
-        setInterval(() -> {
+        setInterval(() => {
             game.tick()
         }, 1000)
 
