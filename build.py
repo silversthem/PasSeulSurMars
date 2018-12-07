@@ -11,7 +11,7 @@ CREATE TABLE Player (
     y int,
     food int,
     thirst int,
-    oxygene int,
+    oxygen int,
     stamina int,
     stress int,
     status text,
@@ -23,12 +23,12 @@ db.commit()
 
 db.execute('''
 CREATE TABLE Object (
-    id int PRIMARY KEY,
+    id int PRIMARY KEY AUTOINCREMENT,
     token int,
     x int,
     y int,
     type int,
-    Attr text,
+    attr int,
     FOREIGN KEY(token) REFERENCES Player(token)
 );
 CREATE TABLE Ressource (
@@ -36,8 +36,8 @@ CREATE TABLE Ressource (
     token int,
     x int,
     y int,
-    type int,
     total int,
+    type int,
     FOREIGN KEY(token) REFERENCES Player(token)
 )
 ''')

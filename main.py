@@ -8,6 +8,8 @@ from server import Session
 
 app = Flask(__name__)
 
+from json import dumps, loads
+
 @app.route("/") # Main page
 def index():
     return render_template('assets/html/index.html')
@@ -30,11 +32,11 @@ def main(token):
 def update(token, methods=['POST']):
     db = sqlite3.connect('db.sqlite')
     session = Session(db,token)
-    game = session.load()
-    update = request.form.get('action') # TODO : dict
+    game = Game(*session.load())
+    update = request.form.get('action')
     changes = game.update(update)
     session.update(changes)
-    return changes # @TODO : Json formatted
+    return dumps(changes) # Json formatted
 
 @app.route('tick/<session>/<time>') # Updates game every X seconds
 def tick(token,time):
@@ -42,4 +44,5 @@ def tick(token,time):
     session = Session(db,token)
     game = session.load()
     changes = game.tick(int(time))
-    return changes
+    session.update(changes)
+    return dumps(changes) # Json formatted
