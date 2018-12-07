@@ -31,7 +31,7 @@ def update(token, methods=['POST']):
     db = sqlite3.connect('db.sqlite')
     session = Session(db,token)
     game = session.load()
-    update = request.form.get('action')
+    update = request.form.get('action') # TODO : dict
     changes = game.update(update)
     session.update(changes)
     return changes # @TODO : Json formatted

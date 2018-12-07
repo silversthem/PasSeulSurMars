@@ -36,7 +36,8 @@ CREATE TABLE Ressource (
     token int,
     x int,
     y int,
-    mined int
+    type int,
+    total int,
     FOREIGN KEY(token) REFERENCES Player(token)
 )
 ''')
