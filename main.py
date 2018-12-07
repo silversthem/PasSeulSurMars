@@ -4,7 +4,10 @@ from flask import render_template
 from flask import redirect,url_for
 import sqlite3
 
-from server import Session
+
+from game.Game import Game
+from server.Session import Session
+from game.chatbot import chatbot
 
 app = Flask(__name__)
 
@@ -42,7 +45,16 @@ def update(token, methods=['POST']):
 def tick(token,time):
     db = sqlite3.connect('db.sqlite')
     session = Session(db,token)
-    game = session.load()
+    game = Game(*session.load())
     changes = game.tick(int(time))
     session.update(changes)
     return dumps(changes) # Json formatted
+
+@app.route('chatbot/<session>/<pid>/<qcmid>')
+def chat(token,pid,qcmid):
+    db = sqlite3.connect('db.sqlite')
+    session = Session(db,token)
+    game = Game(*session.load())
+    cbot = chatbot(100 - game.Player["stress"])
+    message = cbot.update_chat(pid, qcmid, game.Ressource, [game.Player["x"], game.Player["y"]])
+    return dumps(message)

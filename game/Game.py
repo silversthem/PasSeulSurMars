@@ -74,6 +74,7 @@ def IndexToCoord(num):
 class Game:
     def __init__(self, map, player, ressources): # Creates a game object from a map and a player
         self.map = map
+        self.player = player
         self.ressources = ressources
     def update(self,action):
         # Updates game from user input, returns changes
