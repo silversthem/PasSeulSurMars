@@ -1,4 +1,4 @@
-function sendPostCode(action,token,callback) {
+function postRequest(action,token,callback) {
     var http = new XMLHttpRequest();
     var url = '/update/' + token;
     var params = "";
@@ -10,16 +10,19 @@ function sendPostCode(action,token,callback) {
     http.open('POST', url, true);
     http.send(params);
     http.onreadystatechange = function() {
-      if (this.readyState == 4 && this.status == 200) {
+      if(this.readyState == 4 && this.status == 200) {
         callback(eval(http.responseText))
       }
     };
 }
 
-function sendGetCode(token, time) {
+function getRequest(url, callback) {
     var http = new XMLHttpRequest();
-    var url = '/tick/' + token + '/1';
     http.open('GET', url, true);
     http.send();
-    return eval(http.responseText);
+    http.onreadystatechange = function() {
+      if(this.readyState == 4 && this.status == 200) {
+        callback(eval(http.responseText))
+      }
+    }
 }

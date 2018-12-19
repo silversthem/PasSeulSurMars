@@ -1,19 +1,29 @@
-function Game(map, player, ressource, token) {
-    this.token = token;
-    this.map = map;
-    this.player = player;
-    this.ressource = ressource;
+/*
+  Main clientside class
+*/
 
-    this.width = 25;
+function Game(token, player) {
+    /*
+      Constructor
+    */
+    this.session_id = token; // Game session
+    this.player_id  = player; // Client player
+    /* Tileset attributes */
+    this.width  = 25;
     this.height = 25;
-
-    this.tileX = 32;
-    this.tileY = 32;
-
+    this.tileX  = 32;
+    this.tileY  = 32;
+    /* Game attributes */
     this.build = ""; //building type
 
+    /*
+      Methods
+    */
+
+    // Creates event listeners for interaction
     this.createEventListeners = function() {
         var that = this;
+        // Keyboard
         addEventListener('keydown', function(event) {
             if(event.keyCode == 37) { //left key
                 sendPostCode({'move':'left'}, that.token, function(rep) {
@@ -33,7 +43,7 @@ function Game(map, player, ressource, token) {
               });
             }
         });
-
+        // Mouse click
         addEventListener('mousedown', function(event) {
             if (event.keyCode == 0) {
                 coord = psoToCoord(event.clientX, event.clientY);
