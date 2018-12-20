@@ -18,6 +18,8 @@ CREATE TABLE Player (
     session  int,
     name     varchar(128),
     password varchar(256),
+    x int,
+    y int,
     data     text,
     FOREIGN KEY(session) REFERENCES Session(id)
 )''')

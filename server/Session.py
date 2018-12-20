@@ -4,6 +4,13 @@
 from time import time # timestamp
 import hashlib # hashing passwords in database
 
+from .sql import select, insert, update
+from .game.Game import Game
+from .game.chatbot import chatbot
+from .game.map import generateMap,generateRessources
+from .game.objects import cycle
+from .game.player import update_player
+
 def sha(pw):
     return hashlib.sha256(pw.encode('utf-8')).hexdigest()
 
@@ -11,102 +18,65 @@ class Session:
     def __init__(self,db,token = None): # Creates a session
         self.db = db
         self.token = token
+        if token is not None:
+            s = select(self.db,'SELECT * FROM Session WHERE id = ?',(self.token))[0]
+            self.last_update = s['last_update']
+            self.session_admin = s['admin']
     # Session & User related
     def login(self,username,pwd): # Logs in user and returns player id, returns -1 if unable to
-        cursor = self.db.cursor()
-        cursor.execute('SELECT id FROM Player WHERE session = ? AND name = ? AND password = ?', \
-            (self.token,username,sha(pwd)))
-        pid = cursor.fetchone()
-        return pid[0] if pid is not None else -1
+        return select(self.db,'SELECT id FROM Player WHERE session = ? AND name = ? AND password = ?',(self.token,username,sha(pwd)))[0].get('id',-1)
     def create(self): # Create new session
         # Creating new session in db
-        self.db.execute('INSERT INTO Session VALUES (NULL,'+ str(int(time())) +',NULL)')
-        self.db.commit()
+        insert(self.db,'Session',(None,0,None))
         # Fetching session id
-        cursor = self.db.cursor()
-        cursor.execute('SELECT id FROM Session ORDER BY id DESC LIMIT 1')
-        session = cursor.fetchone()
-        self.token = session[0]
+        self.token = select(self.db,'SELECT id FROM Session ORDER BY id DESC LIMIT 1')[0].get('id')
+        self.last_update = 0
+        self.session_admin = None
         return self.token
     def set_admin(self,pid): # Sets player with id pid as admin of this session
-        self.db.execute('UPDATE Session SET admin = ? WHERE id = ?',(pid,self.token))
-        self.db.commit()
+        update(self.db,'Session','id = ?',[self.token],{'admin':pid})
+        self.session_admin = pid
     def add_new_player(self,username,password): # Adds a new player to this session, returns player id
-        self.db.execute('INSERT INTO Player VALUES (NULL,?,?,?,"{}")',(self.token,username,sha(password)))
-        self.db.commit()
-        cursor = self.db.cursor()
-        cursor.execute('SELECT id FROM Player ORDER BY id DESC LIMIT 1')
-        player = cursor.fetchone()
-        return player[0]
+        insert(self.db,'Player',(None,self.token,username,sha(password),0,0,"{}"))
+        return select(self.db,'SELECT id FROM Player ORDER BY id DESC LIMIT 1')[0].get('id')
     def fill_session(self,session,pid): # Fills a flask session to maintain connexion
         session["player_id"] = pid
-    # Game database related
-    def load(self):
-        # Player data
-        cursor = self.db.cursor()
-        cursor.execute('SELECT * FROM Player WHERE token = ' + str(int(self.token)))
-        dt = cursor.fetchone()
-        pid, x, y, food, thirst, ox, stamina, stress, status, days, inv = dt
-        player = {'id':pid,'x':int(x),'y':int(y),'food':int(food),'thirst':int(thirst),'ox':int(ox)}
-        # Map data
-        cursor = self.db.cursor()
-        cursor.execute('SELECT * FROM Object WHERE token = ' + str(int(self.token)))
-        rows = cursor.fetchall()
-        # Empty map
-        mp = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-        0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-        0,1,2,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-        0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,
-        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,2,1,0,0,0,0,0,
-        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,2,1,1,0,0,0,0,0,
-        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,
-        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-        0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-        1,1,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-        2,2,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-        2,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-        1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,
-        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,2,1,1,0,0,0,0,0,0,
-        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,2,2,1,0,0,0,0,0,
-        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,
-        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-        0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-        0,0,0,0,1,2,2,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-        for row in rows:
-            bid, token, x, y, btype, Attr = row
-            mp[int(y)*25 + x] = {'type':int(btype),'id':int(bid), 'attr':Attr}
-        # Ressources
-        ressources = []
-        cursor = self.db.cursor()
-        cursor.execute('SELECT * FROM Ressource WHERE token = ' + str(int(self.token)))
-        rows = cursor.fetchall()
-        for row in rows:
-            rid, token, x, y, total, rtype = row
-            ressources.append({'id':rid,'token':token,'x':x,'y':y,'total':total,'type':rtype})
-        return (mp,player,ressources)
-    def update(self,changes):
-        for c in changes:
-            if "move" in c: # Moves player
-                self.db.execute('UPDATE Player SET x = ' + c["x"] + ', y = ' + c['y'] + ' WHERE token = ' + str(int(self.token)))
-                self.db.commit()
-            elif "construct" in c: # Adds object
-                self.db.execute('INSERT INTO Object VALUES (NULL,'+str(int(self.token))+','+ str(c['x']) +','+ str(c['y']) +', '+ str(c['type']) +',0)')
-                self.db.commit()
-                cursor = self.db.cursor()
-                cursor.execute('SELECT id FROM Object ORDER BY id DESC LIMIT 1')
-                cid = cursor.fetchone()
-                c["id"] = cid
-                c["attr"] = 0
-            elif "type" in c: # Changes value
-                if c["type"] == "ressource":
-                    self.db.execute('UPDATE Ressource SET total = ' + str(c["attr"]) + ' WHERE id = ' + str(int(c["id"])))
-                    self.db.commit()
-                elif c["type"] == "object":
-                    self.db.execute('UPDATE Object SET attr = ' + str(c["attr"]) + ' WHERE id = ' + str(int(c["id"])))
-                    self.db.commit()
+    # Game database reading
+    def get_session_data(self,table,cols = '*'): # Returns a table from a session
+        return select(self.db,'SELECT ' + cols + ' FROM ' + table + ' WHERE session = ?',(self.token))
+    # Game database writing
+    def update_last_update(self):
+        update(self.db,'Session','id = ?',[self.token],{'last_update':int(time())})
+    def write_ressources(self,rs):
+        for r in rs:
+            insert(self.db,'Ressource',(None,self.token,r[2],r[0],r[1],r[3]))
+    # Main sesssion functions
+    def load(self,pid): # Loads game
+        s = select(self.db,'SELECT * FROM Session WHERE id = ?',(self.token))[0]
+        if len(s):
+            c = {"players":[],"objects":[],"ressources":[],"map":[],"status":1}
+            if int(s['last_update']) is 0: # generate game data
+                self.write_ressources(generateRessources([(-100,-100),(100,100)]))
+                self.update_last_update()
+            else: # fetch game data
+                self.tick()
+                c['objects'] = self.get_session_data('Object')
+            c['players'] = self.get_session_data('Player','name,id,x,y,data')
+            c['ressources'] = self.get_session_data('Ressource')
+            for p in c['players']:
+                if int(p['id']) == int(pid):
+                    c['map'] = generateMap(int(p['x']),int(p['y']))
+            return c
+        return {"status":-1}
+    def update(self,pid,change): # Updates game from client input
+        pass
+    def tick(self): # Updates game
+        d = int(time()) - int(self.last_update)
+        c = {"players":self.get_session_data('Player','name,id,x,y,data'),"objects":[],"ressources":[],"map":[],"status":0}
+        if d > 0:
+            c['status'] = 1
+            changed_objects, changed_ressources = cycle(d,self.get_session_data('Object'),self.get_session_data('Ressource'))
+            c['objects'] = changed_objects
+            c['ressources'] = changed_ressources
+            self.update_last_update()
+        return c

@@ -4,18 +4,15 @@ from flask import render_template
 from flask import redirect,url_for, send_from_directory
 import sqlite3
 import os
+from json import dumps, loads
 
-from game.Game import Game
 from server.Session import Session
-from game.chatbot import chatbot
 
 app = Flask(__name__,template_folder='assets/html',static_url_path='')
 app.secret_key = 'EHEHEHE'
 
 def get_db():
     return sqlite3.connect('db.sqlite')
-
-from json import dumps, loads
 
 # App routes
 
@@ -25,8 +22,11 @@ def index():
 
 @app.route("/logout")
 def logout():
-    #@TODO : destroy session variables
-    return 'Successfully logged out. Bye !'
+    if 'player_id' in session:
+        session.pop('player_id')
+        return 'Successfully logged out. Bye !'
+    else:
+        return 'Not logged in'
 
 @app.route("/join",methods=['POST']) # Joins existing session
 def join():
@@ -66,28 +66,34 @@ def main(token):
 @app.route("/update/<token>",methods=['POST']) # Updates game on user input
 def update(token):
     if 'player_id' in session:
-        pass
+        game = Session(get_db(),token)
+        return dumps(game.update(session['player_id'],request.form))
 
 @app.route('/load/<token>') # Returns game state
 def load(token):
     if 'player_id' in session:
-        # @TODO : other players, all objects and ressources in a json object
-        pass
+        # other players, all objects and ressources in a json object
+        game = Session(get_db(),token)
+        return dumps(game.load(session['player_id']))
+    return '{"status":-2}'
 
 @app.route('/tick/<token>') # Updates game
 def tick(token):
     if 'player_id' in session:
-        # @TODO : Update about other users
-        # @TODO : Check timestamp for last update in session
-        # @TODO : update everything by elapsed time & update last update in session
-        pass
+        # Update about other users
+        # Check timestamp for last update in session
+        # update everything by elapsed time & update last update in session
+        game = Session(get_db(),token)
+        return dumps(game.tick())
+    return '{"status":-2}'
 
 @app.route('/chatbot/<token>/<pid>/<qcmid>')
 def chat(token,pid,qcmid):
     if 'player_id' in session:
         #cbot = chatbot(100 - game.Player["stress"])
         #message = cbot.update_chat(pid, qcmid, game.Ressource, [game.Player["x"], game.Player["y"]])
-        pass
+        return '{}'
+    return '{"status":-2}'
 
 # Static files routes
 
