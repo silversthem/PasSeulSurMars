@@ -1,0 +1,61 @@
+body, html {
+  height: 100%;
+}
+
+#actionMenu {
+  height: 100%;
+  width: 20%;
+  border-right: 1px solid grey;
+  float: left;
+}
+
+#mainAction {
+  float: right;
+  width: 79%;
+  height: 100%;
+}
+
+#playerPanel {
+  position: absolute;
+  top: 0px;
+  right: 100px;
+  border: 1px solid grey;
+  border-top: 0;
+  width: 500px;
+  height: 250px;
+}
+
+#gamePanel {
+    margin-top: 60px;
+    margin-left: 50px;
+    display: grid;
+}
+
+#coordsPanel, #gameCanvas, #hoverCoordsPanel {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+#coordsPanel, #hoverCoordsPanel {
+  z-index: 1000;
+  height: min-content;
+  width: 100px;
+  height: 20px;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+#hoverCoordsPanel {
+  margin-top: 20px;
+  color: green;
+}
+
+#chatbotPanel {
+  position: absolute;
+  bottom: 0px;
+  right: 100px;
+  border: 1px solid grey;
+  border-bottom: 0;
+  width: 500px;
+  height: 600px;
+}

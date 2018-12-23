@@ -1,12 +1,10 @@
-function postRequest(action,token,callback) {
+function postRequest(url,action,callback) {
     var http = new XMLHttpRequest();
-    var url = '/update/' + token;
     var params = "";
     for(var k in Object.keys(action)) {
         params += '' + k + '=' + action[k];
     }
     params = params.slice(0, params.length-1);
-    console.log(params);
     http.open('POST', url, true);
     http.send(params);
     http.onreadystatechange = function() {

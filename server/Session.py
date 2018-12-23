@@ -3,16 +3,19 @@
 
 from time import time # timestamp
 import hashlib # hashing passwords in database
+from json import dumps, loads
 
 from .sql import select, insert, update
 from .game.Game import Game
 from .game.chatbot import chatbot
 from .game.map import generateMap,generateRessources
 from .game.objects import cycle
-from .game.player import update_player
+from .game.player import generatePlayer,updatePlayer
 
 def sha(pw):
     return hashlib.sha256(pw.encode('utf-8')).hexdigest()
+
+formatDataField = {'data':(lambda x : loads(x))}
 
 class Session:
     def __init__(self,db,token = None): # Creates a session
@@ -37,19 +40,19 @@ class Session:
         update(self.db,'Session','id = ?',[self.token],{'admin':pid})
         self.session_admin = pid
     def add_new_player(self,username,password): # Adds a new player to this session, returns player id
-        insert(self.db,'Player',(None,self.token,username,sha(password),0,0,"{}"))
+        insert(self.db,'Player',(None,self.token,username,sha(password),0,0,dumps(generatePlayer())))
         return select(self.db,'SELECT id FROM Player ORDER BY id DESC LIMIT 1')[0].get('id')
     def fill_session(self,session,pid): # Fills a flask session to maintain connexion
         session["player_id"] = pid
     # Game database reading
     def get_session_data(self,table,cols = '*'): # Returns a table from a session
-        return select(self.db,'SELECT ' + cols + ' FROM ' + table + ' WHERE session = ?',(self.token))
+        return select(self.db,'SELECT ' + cols + ' FROM ' + table + ' WHERE session = ?',(self.token),formatDataField)
     # Game database writing
     def update_last_update(self):
         update(self.db,'Session','id = ?',[self.token],{'last_update':int(time())})
     def write_ressources(self,rs):
         for r in rs:
-            insert(self.db,'Ressource',(None,self.token,r[2],r[0],r[1],r[3]))
+            insert(self.db,'Ressource',(None,self.token,r[2],r[0],r[1],dumps(r[3])))
     # Main sesssion functions
     def load(self,pid): # Loads game
         s = select(self.db,'SELECT * FROM Session WHERE id = ?',(self.token))[0]
@@ -69,14 +72,20 @@ class Session:
             return c
         return {"status":-1}
     def update(self,pid,change): # Updates game from client input
-        pass
+        if change['action'] == 'move':
+            # Changes player data to reflect new movement
+            return '{"status":1}'
     def tick(self): # Updates game
         d = int(time()) - int(self.last_update)
         c = {"players":self.get_session_data('Player','name,id,x,y,data'),"objects":[],"ressources":[],"map":[],"status":0}
+        # Update map and players
+
         if d > 0:
             c['status'] = 1
             changed_objects, changed_ressources = cycle(d,self.get_session_data('Object'),self.get_session_data('Ressource'))
             c['objects'] = changed_objects
             c['ressources'] = changed_ressources
             self.update_last_update()
+        # Write change into db
+
         return c

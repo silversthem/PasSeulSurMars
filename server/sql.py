@@ -6,7 +6,8 @@ def insert(db,table,values):
     db.commit()
 
 # Queries the database and yield each row as dict of colname:rowvalue
-def select(db,query,args = ()):
+def select(db,query,args = (),formatField = {}):
+    noTransform = lambda x : x
     cur = db.cursor()
     cur.execute(query,args)
     cols = [k[0] for k in cur.description]
@@ -16,7 +17,7 @@ def select(db,query,args = ()):
     else:
         r = []
         for row in rows:
-            r.append({cols[i]:row[i] for i in range(len(cols))})
+            r.append({cols[i]:(formatField.get(cols[i],noTransform)(row[i])) for i in range(len(cols))})
         return r
 
 # Updates database

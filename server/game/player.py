@@ -1,5 +1,9 @@
 from json import dumps, loads
 
+# Generates player
+def generatePlayer():
+    return {'inMotion':False,'toward':{'x':0,'y':0}}
+
 # Updates player data
-def update_player(delta,pl):
+def updatePlayer(delta,pl):
     pass
