@@ -84,7 +84,7 @@ def tick(token):
         # Check timestamp for last update in session
         # update everything by elapsed time & update last update in session
         game = Session(get_db(),token)
-        return dumps(game.tick())
+        return dumps(game.tick(session['player_id']))
     return '{"status":-2}'
 
 @app.route('/chatbot/<token>/<pid>/<qcmid>')

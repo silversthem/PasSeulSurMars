@@ -7,12 +7,12 @@ function Panel() {
   this.hoverCoordsPanel = document.getElementById('hoverCoordsPanel')
   this.focusedActionPanel = document.getElementById('focusedActionPanel')
   // Updates current player coords display
-  this.setCurrentCoords = (x,y) => {
-    this.coordsPanel.innerHTML = '(' + x + ' ; ' + y + ')'
+  this.setCurrentCoords = (coords) => {
+    this.coordsPanel.innerHTML = '(' + coords.x + ' ; ' + coords.y + ')'
   }
   // Updates current hovered position
-  this.setCurrentHoverCoords = (x,y) => {
-    this.hoverCoordsPanel.innerHTML = '(' + x + ' ; ' + y + ')'
+  this.setCurrentHoverCoords = (coords) => {
+    this.hoverCoordsPanel.innerHTML = '(' + coords.x + ' ; ' + coords.y + ')'
   }
   // Updates focused action panel
   this.setFocusedActionPanel = (content) => {

@@ -1,8 +1,10 @@
 # Builds database
 
+import sys
 import sqlite3
 
-db = sqlite3.connect('db.sqlite')
+name = sys.argv[1] + '.sqlite' if len(sys.argv) > 1 else 'db.sqlite'
+db = sqlite3.connect(name)
 
 db.execute('''
 CREATE TABLE Session (

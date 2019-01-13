@@ -2,18 +2,14 @@
 # Bridges the gap between game logic and database
 
 from time import time # timestamp
-import hashlib # hashing passwords in database
-from json import dumps, loads
+from json import dumps, loads # Json encode/decode
 
-from .sql import select, insert, update
-from .game.Game import Game
+from .sql import select, insert, update, updateMultiple
+from .utils import merge_dicts, sha
 from .game.chatbot import chatbot
 from .game.map import generateMap,generateRessources
 from .game.objects import cycle
 from .game.player import generatePlayer,updatePlayer
-
-def sha(pw):
-    return hashlib.sha256(pw.encode('utf-8')).hexdigest()
 
 formatDataField = {'data':(lambda x : loads(x))}
 
@@ -53,6 +49,21 @@ class Session:
     def write_ressources(self,rs):
         for r in rs:
             insert(self.db,'Ressource',(None,self.token,r[2],r[0],r[1],dumps(r[3])))
+    # Game database updating
+    def update_ressources(self,ressources): # Updates ressources in database
+        pass
+    def update_objects(self,objects): # Updates objects in database
+        pass
+    def update_players(self,players): # Updates players in database
+        for pl in players: # Json format data field
+            pl['data'] = dumps(pl['data'])
+        updateMultiple(self.db,'Player','id = ?',[[pl['id']] for pl in players],players)
+    def update_player_data(self,pid,udata): # Updates player data in database
+        players = self.get_session_data('Player')
+        for pl in players:
+            if pl['id'] == pid:
+                pl['data'] = merge_dicts(pl['data'],udata)
+                update(self.db,'Player','id = ?',[pid],{'data':dumps(pl['data'])})
     # Main sesssion functions
     def load(self,pid): # Loads game
         s = select(self.db,'SELECT * FROM Session WHERE id = ?',(self.token))[0]
@@ -62,30 +73,40 @@ class Session:
                 self.write_ressources(generateRessources([(-100,-100),(100,100)]))
                 self.update_last_update()
             else: # fetch game data
-                self.tick()
+                self.tick(pid)
                 c['objects'] = self.get_session_data('Object')
             c['players'] = self.get_session_data('Player','name,id,x,y,data')
             c['ressources'] = self.get_session_data('Ressource')
             for p in c['players']:
                 if int(p['id']) == int(pid):
-                    c['map'] = generateMap(int(p['x']),int(p['y']))
+                    c['map'] = generateMap(int(p['x']),int(p['y'])) # Returns map around this player
+                    self.update_player_data(pid,{'online':True})
             return c
         return {"status":-1}
     def update(self,pid,change): # Updates game from client input
         if change['action'] == 'move':
             # Changes player data to reflect new movement
+            self.update_player_data(pid,{'inMotion':True,'toward':{'x':int(change['x']),'y':int(change['y'])}})
             return '{"status":1}'
-    def tick(self): # Updates game
+        return '{"status":0}'
+    def tick(self,pid): # Updates game
         d = int(time()) - int(self.last_update)
         c = {"players":self.get_session_data('Player','name,id,x,y,data'),"objects":[],"ressources":[],"map":[],"status":0}
-        # Update map and players
-
         if d > 0:
             c['status'] = 1
+            # Updates players
+            for pl in c['players']:
+                updatePlayer(d,pl)
+                if pl['id'] == pid: # Updates map for session player
+                    c['map'] = generateMap(pl['x'],pl['y'])
+            # Updates objects & ressources
             changed_objects, changed_ressources = cycle(d,self.get_session_data('Object'),self.get_session_data('Ressource'))
             c['objects'] = changed_objects
             c['ressources'] = changed_ressources
+            # Write change into db
+            self.update_ressources(changed_ressources)
+            self.update_objects(changed_objects)
+            self.update_players(c['players'])
+            # Updates last database update
             self.update_last_update()
-        # Write change into db
-
         return c

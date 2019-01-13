@@ -20,13 +20,26 @@ def select(db,query,args = (),formatField = {}):
             r.append({cols[i]:(formatField.get(cols[i],noTransform)(row[i])) for i in range(len(cols))})
         return r
 
-# Updates database
-def update(db,table,where,args,setv):
+# Returns sql syntax for an update query
+def update_query(table,where,args,setv):
     q = 'UPDATE ' + table + ' SET '
-    for k in setv:
-        q += k + '= ? '
-    q += 'WHERE ' + where
+    q += ','.join([k + ' = ?' for k in setv])
+    q += ' WHERE ' + where
     a = [setv[k] for k in setv]
     a.extend(args)
+    return (q,a)
+
+# Updates a row in database
+def update(db,table,where,args,setv):
+    q,a = update_query(table,where,args,setv)
     db.execute(q,a)
+    db.commit()
+
+# Updates multiple rows in one commit
+def updateMultiple(db,table,where,args,setv):
+    if len(args) != len(setv):
+        raise Exception('Wrong pair of row id/rows',table,len(args),leng(setv))
+    for i in range(len(args)):
+        q,a = update_query(table,where,args[i],setv[i])
+        db.execute(q,a)
     db.commit()
