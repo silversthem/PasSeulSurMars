@@ -16,6 +16,6 @@ function Panel() {
   }
   // Updates focused action panel
   this.setFocusedActionPanel = (content) => {
-
+    
   }
 }

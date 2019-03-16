@@ -38,11 +38,6 @@ function GameCanvas(id,playerDataModelCallback,gameDataModelCallback) {
     this.click[0](coords)
   })
 
-  // Main drawing cycle
-  setInterval(() => {
-    this.draw(this.getPlayer(),this.getData())
-  },200)
-
   /* Methods */
 
   // Loads textures
@@ -58,6 +53,17 @@ function GameCanvas(id,playerDataModelCallback,gameDataModelCallback) {
   }
 
   /* Canvas methods */
+
+  // Main drawing cycle
+  this.run = () => {
+    setInterval(() => {
+      let pldata = this.getPlayer()
+      let dData  = this.getData()
+      if(pldata !== undefined && dData !== undefined) {
+        this.draw(pldata,dData)
+      }
+    },40) // 25 Frames a second
+  }
 
   // Draws game on canvas
   this.draw = (player,game) => {

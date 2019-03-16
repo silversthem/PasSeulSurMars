@@ -55,9 +55,9 @@ class Session:
     def update_objects(self,objects): # Updates objects in database
         pass
     def update_players(self,players): # Updates players in database
-        for pl in players: # Json format data field
-            pl['data'] = dumps(pl['data'])
-        updateMultiple(self.db,'Player','id = ?',[[pl['id']] for pl in players],players)
+        # for pl in players: # Json format data field
+        #     pl['data'] = dumps(pl['data'])
+        updateMultiple(self.db,'Player','id = ?',[[pl['id']] for pl in players],players,{'data':lambda x : dumps(x)})
     def update_player_data(self,pid,udata): # Updates player data in database
         players = self.get_session_data('Player')
         for pl in players:

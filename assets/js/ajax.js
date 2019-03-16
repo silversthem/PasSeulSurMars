@@ -10,7 +10,7 @@ function postRequest(url,action,callback) {
     http.send(params)
     http.onreadystatechange = function() {
       if(this.readyState == 4 && this.status == 200) {
-        callback(eval('(' + http.responseText + ')'))
+        callback(eval('('+ JSON.parse(http.responseText) +')'))
       }
     }
 }

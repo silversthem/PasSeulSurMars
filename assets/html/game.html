@@ -18,8 +18,8 @@
       </div>
       <div id="gamePanel">
         <canvas id="gameCanvas"></canvas>
-        <p id="coordsPanel">(Loading ; Loading)</p>
-        <p id="hoverCoordsPanel">(0 ; 0)</p>
+        <p id="coordsPanel">(? ; ?)</p>
+        <p id="hoverCoordsPanel">(? ; ?)</p>
       </div>
       <div id="chatbotPanel">
         <p>chatbot</p>
@@ -28,6 +28,8 @@
     <script src="/js/ajax.js" ></script>
     <script src="/js/Panel.js"></script>
     <script src="/js/GameCanvas.js"></script>
+    <script src="/js/ServerData.js"></script>
+    <script src="/js/clientside.js"></script>
     <script src="/js/Game.js" ></script>
     <script>
       var game = new Game({{ token }}, {{ player_id }}) // Game with session id & player id
