@@ -1,0 +1,58 @@
+{
+  "ice":{
+      "ressource": {
+        "name":"ice",
+        "type":"crystal",
+        "quality":[1,3],
+        "quantity":[1000,10000],
+        "density":1,
+        "texture":"ressource/crystal-icy.png"
+      },
+      "item": {
+        "name":"water",
+        "type":"fluid"
+      }
+  },
+  "metal":{
+      "ressource": {
+        "name":"metal",
+        "type":"crystal",
+        "quality":[1,3],
+        "quantity":[250,5000],
+        "density":0.5,
+        "texture":"ressource/crystal-red.png"
+      },
+      "item": {
+        "name":"metal",
+        "type":"solid"
+      }
+  },
+  "om":{
+      "ressource": {
+        "name":"organic matter",
+        "type":"crystal",
+        "quality":[1,5],
+        "quantity":[4000,20000],
+        "density":0.25,
+        "texture":"ressource/crystal-gold.png"
+      },
+      "item": {
+        "name":"soil",
+        "type":"solid"
+      }
+  },
+  "nm":{
+      "ressource": {
+        "name":"nuclear matter",
+        "type":"crystal",
+        "quality":[1,10],
+        "quantity":[400,5000],
+        "density":0.125,
+        "texture":"ressource/crystal-nuclear.png"
+      },
+      "item": {
+        "name":"uranium",
+        "type":"solid"
+      }
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "objects":{
+    "solarpanel":4,
+    "drill":4,
+    "cable":10,
+    "pipe":10,
+    "refinery":1,
+    "etank":1
+  },
+  "items":{
+    "food":25,
+    "waterJug":50,
+    "oxygenCell":10
+  }
+}

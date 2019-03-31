@@ -1,2 +1,3 @@
-Nous avons créé un jeu de survie et de gestion d'un homme étant le premier colon sur Mars, et chargé de préparer une base viable pour les colons qui doivent arriver plus tard.
-Pour cela il dispose pour commencer d'une serre, de panneaux solaires et d'un robot sarcastique nommé Albot qui surveille sont état de santé et dispose de capteurs pour l'aider.Il pourra donc explorer la carte avec Albot et scanner le terrain pour faire des découvertes. Au fur et à mesure qu'il découvre des ressources pour survivre, faire fonctionner et développer la base, la station orbitale lui envoie l'infrastructure nécessaire pour recolter et transformer ces ressources. Une fois qu'il a développer suffisamment la base, les colons arrivent  et il peut rentrer sur Terre pour former de nouveaux explorateurs.
+PasSeulSurMars is a game about colony building on an alien planet.
+Originally designed in the context of a coding competition, changes have since been made to the game's structure.
+(Game is now multiplayer and is not aimed toward being an educative simulation about establishing a colony on Mars).

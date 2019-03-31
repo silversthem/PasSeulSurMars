@@ -1,100 +1,62 @@
-/*
-  Main clientside class
-*/
+var cookie = new Cookie()
 
-function Game(token, player) {
-    /* Properties */
-    this.tickrate = {'server':200,'client':40}
-    this.tickrateRatio = this.tickrate.server/this.tickrate.client
-    /* Attributes */
-    this.game = new ServerData(player) // Game content
-    this.session_id = token // Game session
-    this.player_id  = player // Client player
-    // Game Panel
-    this.panels = new Panel()
-    // Game canvas
-    this.canvas = new GameCanvas('gameCanvas',
-      () => {return this.game.player}, // Returns current player data
-      () => {return this.game}) // Returns all other game data
-    /* Loading game */
-    getRequest('/load/' + token,(rep) => {
-      this.game.update(rep)
-      this.canvas.loadTextures()
-      var texturesLoaded = setInterval(() => {
-        if(this.canvas.texturesToLoad == 0) { // All textures are loaded
-          clearInterval(texturesLoaded)
-          // Server updates 5 times a second
-          setInterval(() => {
-            this.tick()
-          },this.tickrate.server)
-          // Client updates 20 times a second
-          setInterval(() => {
-            this.client_tick(this.game.player)
-          },this.tickrate.client)
-          // Starts Canvas
-          this.canvas.run()
-        }
-      },50)
+function Game(serveraddr,authGUI,gameGUI) {
+  // game gui is hidden by default until user is authentified (id : GAME)
+  this.gameGUI = document.getElementById(gameGUI)
+  this.gameGUI.style.display = 'none'
+  // auth gui is active by default (id : AUTH)
+  /* Auth user */
+  this.socket = getAuthSocket(cookie,"ws://" + serveraddr,'AUTH',(sessionid,pid) => {
+    this.gameData.sid = sessionid // sets session id
+    this.gameData.pid = pid // sets player id
+    // Socket response handling method
+    this.socket.onmessage = (event) => {
+      let data = JSON.parse(event.data)
+      this.handleResponse(data)
+    }
+    this.socket.send('{"load":1}') // asks server for initial game data
+  })
+
+  /* Attributes */
+
+  // Client panels handler
+  this.gamePanel = new Panel()
+  // Client canvas handler
+  this.gameCanvas = new GameCanvas('gameCanvas',() => this.gameData.player,() => this.gameData)
+  // Server data handler
+  this.gameData = new ServerData()
+
+  // Called when game is successfully loaded
+  this.gameData.onloaded = () => {
+    this.gameGUI.style.display = 'inline' // Display game gui
+    this.gameCanvas.callOnTextureLoaded(() => {
+      setInterval(() => { // client update interval 25 times a second
+        this.client_tick()
+      },40)
+      // @TODO : set canvas click & hover function
+      this.gameCanvas.run() // Starts canvas
     })
+  }
 
-    /* Game methods */
+  /* Game Methods */
 
-    /* Event listeners */
-    // Default hover action
-    this.canvas.hover = (coords) => {
-      let toward = this.thisTile(coords)
-      this.panels.setCurrentHoverCoords(toward)
-    }
-    // Default left click
-    this.canvas.click[0] = (coords) => {
-      let toward = this.thisTile(coords)
-      let tileContent = this.game.inCoords(toward)
-      if(tileContent.length == 0) { // Empty tile, move toward it
-        this.move(toward)
-      } else { // Focuses on tile
-        this.panels.setFocusedActionPanel(tileContent)
-      }
-    }
+  /* Mouse Actions */
 
-    /* Tick method */
+  // default left click action (move player)
+  // default hover action (get tile info)
+  // build left click
+  // destroy left click
 
-    // Updates game from server
-    this.tick = () => {
-      getRequest('/tick/' + this.session_id, (rep) => {
-        if(rep['status'] == 1) { // Updates
-          this.game.update(rep)
-        }
-      })
-      this.game.player.data.clientTicks = this.tickrateRatio // Each server tick gives x new client ticks
-    }
+  /* Methods */
 
-    // Updates game from client
-    this.client_tick = () => {
-      // Updates players in map clientside
-      this.game.players.forEach((pl) => {
-        movePlayer(pl)
-      })
-      // Sets current player coord
-      this.panels.setCurrentCoords(this.game.player)
-    }
+  // Called every tick to update data clientside
+  // Client ticks are more frequents and kept in sync by server ticks
+  this.client_tick = () => {
 
-    /* Game methods */
+  }
 
-    /* Player methods */
-
-    // Returns tile coords relative to player coords
-    this.thisTile = (coords) => {
-      return {
-        'x':coords.x + this.game.player.x,
-        'y':coords.y + this.game.player.y}
-    }
-    // Registers movement
-    this.move = (coords) => {
-      postRequest('/update/' + this.session_id, {'x':coords.x,'y':coords.y,'action':'move'}, (rep) => {
-        if(rep.status == '1') { // Valid motion
-          this.game.player.data.inMotion = true
-          this.game.player.data.toward = coords
-        }
-      })
-    }
+  // handles server response
+  this.handleResponse = (data) => {
+    this.gameData.update(data)
+  }
 }

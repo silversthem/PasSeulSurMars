@@ -15,7 +15,7 @@ def getRandomCoords(bounds,taken = []):
         y = randrange(bounds[0][1],bounds[1][1])
         good = True
         for coord in taken:
-            if coord[0] == x and coord[1] == y:
+            if coord['x'] == x and coord['y'] == y:
                 good = False
                 break
     return (x,y)
@@ -28,23 +28,16 @@ def getRandomQuality(interval, f = (lambda x : x**3)):
             return interval[1] - i + 1
     return interval[0]
 
-# Returns a list of (x,y,type,data)
-# types of ressources :
-# 0 - Water
-# 1 - Metal
-# 2 - Organic Matter
-# 3 - Nuclear Matter
-def generateRessources(bounds,density = 25,
-        typeDensity = {0:1,1:0.5,2:0.25,3:0.125},
-        fillInterval = {0:[1000,10000],1:[250,5000],2:[4000,20000],3:[400,5000]},
-        qualityInterval = {0:[1,3],1:[1,3],2:[1,5],3:[1,10]}):
+# Returns a dict of (x,y,type,data) for a dictionnary containing the list of all the ressources
+def generateRessources(bounds,ressourcesDict):
     r = []
     d = int(sqrt(sum([sum([c**2 for c in p]) for p in bounds])))
-    for rs in typeDensity:
-        n = int(typeDensity[rs]*d) # Amount of the ressource to display
+    for rs in ressourcesDict:
+        ressource = ressourcesDict[rs].get('ressource',{})
+        n = int(d*ressource.get('density',1)) # Amount of the ressource to display
         for k in range(n):
             x,y = getRandomCoords(bounds,r)
-            data = {'quality':getRandomQuality(qualityInterval[rs]),
-                    'total'  :randrange(fillInterval[rs][0],fillInterval[rs][1] + 1)}
-            r.append((x,y,rs,data))
+            data = {'quality':getRandomQuality(ressource.get('quality',[1,1])),
+                    'total'  :randrange(*ressource.get('quantity',[0,0]))}
+            r.append({'x':x,'y':y,'type':rs,'data':data})
     return r
