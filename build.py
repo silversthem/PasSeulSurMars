@@ -31,7 +31,7 @@ db.execute('''
 CREATE TABLE Object (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     session int,
-    type int,
+    type varchar(64),
     x int,
     y int,
     data text,
@@ -43,12 +43,14 @@ db.execute('''
 CREATE TABLE Ressource (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     session int,
-    type int,
+    type varchar(64),
     x int,
     y int,
     data text,
     FOREIGN KEY(session) REFERENCES Session(id)
 )''')
 db.commit()
+
+# @TODO : Add entity table
 
 db.close()

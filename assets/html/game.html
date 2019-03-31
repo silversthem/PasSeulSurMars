@@ -7,6 +7,31 @@
     <link rel="stylesheet" href="/css/game.css"/>
 </head>
 <body>
+  <!-- Auth UI -->
+  <div id="AUTH">
+    <!-- Login in existing session -->
+    <form id="auth">
+      <input type="text" name="session" placeholder="Session id"/><br/>
+      <input type="text" name="login" placeholder="Login"/><br/>
+      <input type="password" name="password" placeholder="Password"/><br/>
+      <input type="button" value="Log in" id="loginButton"/>
+    </form>
+    <!-- New user in existing session -->
+    <form id="register">
+      <input type="text" name="session" placeholder="Session id"/><br/>
+      <input type="text" name="login" placeholder="Login"/><br/>
+      <input type="password" name="password" placeholder="Password"/><br/>
+      <input type="button" value="Join" id="registerButton"/>
+    </form>
+    <!-- New user & new session -->
+    <form id="registerNew">
+      <input type="text" name="login" placeholder="Login"/><br/>
+      <input type="password" name="password" placeholder="Password"/><br/>
+      <input type="button" value="Create session" id="registerNewButton"/>
+    </form>
+  </div>
+  <!-- Game UI -->
+  <div id="GAME">
     <div id="actionMenu">
       <div id="focusedActionPanel"></div>
       <hr/>
@@ -25,14 +50,18 @@
         <p>chatbot</p>
       </div>
     </div>
-    <script src="/js/ajax.js" ></script>
-    <script src="/js/Panel.js"></script>
-    <script src="/js/GameCanvas.js"></script>
-    <script src="/js/ServerData.js"></script>
-    <script src="/js/clientside.js"></script>
+  </div>
+    <script src="/gameconfig.js"></script>
+    <script src="/js/utils/utils.js"></script>
+    <script src="/js/utils/Cookie.js"></script>
+    <script src="/js/gui/Panel.js"></script>
+    <script src="/js/gui/GameCanvas.js"></script>
+    <script src="/js/game/ServerData.js"></script>
+    <script src="/js/game/clientside.js"></script>
+    <script src="/js/Auth.js" ></script>
     <script src="/js/Game.js" ></script>
     <script>
-      var game = new Game({{ token }}, {{ player_id }}) // Game with session id & player id
+      var game = new Game("{{ serveraddr }}",'AUTH','GAME')
     </script>
 </body>
 </html>

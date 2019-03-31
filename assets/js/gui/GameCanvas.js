@@ -3,9 +3,14 @@
 */
 
 function GameCanvas(id,playerDataModelCallback,gameDataModelCallback) {
+
+  /* Data Callbacks */
+
   this.getPlayer = playerDataModelCallback
   this.getData   = gameDataModelCallback
+
   /* Textures */
+
   this.textureBank = {
     /* Tiles */
     'ground':'/textures/ground/ground.png',
@@ -18,17 +23,25 @@ function GameCanvas(id,playerDataModelCallback,gameDataModelCallback) {
     'nm'   :'/textures/ressources/crystal-green.png' // nuclear matter
   }
   this.texturesToLoad = Object.keys(this.textureBank).length
+
   /* Tileset attributes */
+
   this.mid    = {'x':12,'y':12}
   this.tile   = {'x':32,'y':32,'w':25,'h':25}
+
   /* Game dom elements */
+
   this.canvas = document.getElementById(id)
   this.canvas.width  = this.tile.w * this.tile.x
   this.canvas.height = this.tile.h * this.tile.y
+
   /* Event callbacks */
+
   this.click = {0:(tile) => {},1:(tile) => {}}
   this.hover = (tile) => {}
+
   /* Event listeners */
+
   this.canvas.addEventListener('mousemove',(ms) => {
     let coords = this.getMouseTile(ms)
     this.hover(coords)
@@ -50,6 +63,17 @@ function GameCanvas(id,playerDataModelCallback,gameDataModelCallback) {
         this.texturesToLoad--
       }
     }
+  }
+
+  // Loads textures and calls a function once all loaded
+  this.callOnTextureLoaded = (callback) => {
+    this.loadTextures()
+    let int = setInterval(() => {
+      if(this.texturesToLoad == 0) {
+        clearInterval(int)
+        callback()
+      }
+    },50)
   }
 
   /* Canvas methods */
@@ -84,23 +108,23 @@ function GameCanvas(id,playerDataModelCallback,gameDataModelCallback) {
       if(this.isInBound(player,rs.x,rs.y)) {
         let c = this.coords2repr(player,rs.x,rs.y)
         switch (rs.type) {
-          case 0: // Water
+          case "ice": // Water
             context.drawImage(this.textureBank['ice'],0,0,64,128,c.x,c.y,this.tile.x,this.tile.y)
           break;
-          case 1: // Metal
+          case "metal": // Metal
             context.drawImage(this.textureBank['metal'],0,0,64,128,c.x,c.y,this.tile.x,this.tile.y)
           break;
-          case 2: // Organic matter
+          case "om": // Organic matter
             context.drawImage(this.textureBank['om'],0,0,64,128,c.x,c.y,this.tile.x,this.tile.y)
           break;
-          case 3: // Nuclear matter
+          case "nm": // Nuclear matter
             context.drawImage(this.textureBank['nm'],0,0,64,128,c.x,c.y,this.tile.x,this.tile.y)
           break;
         }
       }
     }
     // drawing objects
-
+    // drawing other players
     // drawing player
     context.drawImage(this.textureBank['player'],0,0,62,67,this.mid.x*this.tile.x,this.mid.y*this.tile.y,this.tile.x,this.tile.y)
   }
@@ -114,6 +138,7 @@ function GameCanvas(id,playerDataModelCallback,gameDataModelCallback) {
     }
     return false;
   }
+
   // Returns where to draw on canvas from coords
   this.coords2repr = (center,x,y) => {
     return {
@@ -121,6 +146,7 @@ function GameCanvas(id,playerDataModelCallback,gameDataModelCallback) {
       'y':(y - center.y + this.mid.y)*this.tile.y
     }
   }
+
   // Returns which tile the mouse is on
   this.getMouseTile = (ms) => {
     var x = parseInt(ms.offsetX/this.tile.x)

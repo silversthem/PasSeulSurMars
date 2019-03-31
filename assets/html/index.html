@@ -6,19 +6,30 @@
 </head>
 <body>
   <div>
-    <form method="post" action="/join">
-      <input type="text" name="session" placeholder="Session id"/><br/>
-      <input type="text" name="login" placeholder="Login"/><br/>
-      <input type="password" name="password" placeholder="Password"/><br/>
-      <input type="submit" value="Join"/>
-    </form>
+    <!-- Log in user in session -->
+    
   </div>
-  <div>
-    <form method="post" action="/new">
-      <input type="text" name="login" placeholder="Login"/><br/>
-      <input type="password" name="password" placeholder="Password"/><br/>
-      <input type="submit" value="Create session"/>
-    </form>
-  </div>
+  <script src="js/utils.js"></script>
+  <script src="js/Cookie.js"></script>
+  <script src="js/index.js"></script>
+  <script>
+    var socket = new WebSocket('ws://' + "{{ serveraddr }}")
+    socket.onopen = (event) => {
+      console.log("Server Reached")
+      document.getElementById('loginButton').onclick = () => {
+        auth('auth')
+      }
+      document.getElementById('registerButton').onclick = () => {
+        register('register')
+      }
+      document.getElementById('registerNewButton').onclick = () => {
+        registerInNewSession('registerNew')
+      }
+    }
+    socket.onmessage = (event) => {
+      var data = JSON.parse(event.data)
+      checkAuth(data)
+    }
+  </script>
 </body>
 </html>

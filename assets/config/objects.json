@@ -1,0 +1,66 @@
+{
+  "cable":{
+    "name":"cable",
+    "type":"cable",
+    "handles":["power"]
+  },
+  "pipe":{
+    "name":"pipe",
+    "type":"cable",
+    "handles":["fluid","gas","solid"]
+  },
+  "drill":{
+    "name":"drill",
+    "type":"production",
+    "uses":["special"],
+    "produces":["special"]
+  },
+  "tank":{
+    "name":"tank",
+    "type":"storage",
+    "stores":["fluid","gas"],
+    "size":"tileable",
+    "tile":"rect"
+  },
+  "warehouse":{
+    "name":"warehouse",
+    "type":"storage",
+    "stores":["solid","item"],
+    "size":"tileable",
+    "tile":"any"
+  },
+  "refinery":{
+    "name":"refinery",
+    "type":"production",
+    "uses":["solid","power"],
+    "produces":["solid"]
+  },
+  "etank":{
+    "name":"electrolysis tank",
+    "type":"production",
+    "uses":["fluid","power"],
+    "produces":["gas"]
+  },
+  "greenhouse":{
+    "name":"greenhouse",
+    "type":"production",
+    "uses":["gas","fluid","power","solid"],
+    "produces":["item"],
+    "size":"tileable",
+    "tile":"any"
+  },
+  "nplant":{
+    "name":"nuclear plant",
+    "type":"production",
+    "uses":["solid","fluid"],
+    "produces":["power"],
+    "size":"tileable",
+    "tile":"square"
+  },
+  "spanel":{
+    "name":"solar panel",
+    "type":"production",
+    "uses":[],
+    "produces":["power"]
+  }
+}

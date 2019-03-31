@@ -3,10 +3,6 @@ from math import fabs
 
 RUNSPEED = 5 # Run speed in seconds
 
-# Generates player
-def generatePlayer():
-    return {'online':True,'inMotion':False,'toward':{'x':0,'y':0}}
-
 # Updates player data
 def updatePlayer(delta,pl):
     # Handles motion
