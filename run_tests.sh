@@ -1,3 +1,21 @@
-echo "--- Starting Tests ---"
-python3 tests.py
-echo "--- End of Tests ---"
+echo ""
+echo "+--------------------+"
+echo "|   Starting Tests   |"
+echo "+--------------------+"
+echo ""
+
+test_file () {
+  echo "> Testing : $1"
+  python3 tests/$1.py
+  echo "***"
+}
+
+test_file Auth
+test_file Load
+test_file Actions
+
+echo ""
+echo "+--------------------+"
+echo "|    Ending Tests    |"
+echo "+--------------------+"
+echo ""

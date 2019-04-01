@@ -11,7 +11,6 @@ class GameServer:
         self.model = GameModel(db) # Game database access class
         self.sessions = {} # Games data as SessionModel, stored by session id
         self.users = {} # Current user sockets
-        self.activeSessions = set() # Current active sessions
         GameServer.LOG = log
         SessionModel.TickTime = tickrate
         self.loadGameConfig()
@@ -77,6 +76,7 @@ class GameServer:
             else: # Auth Failed
                 GameServer.LOG.info('  /!\\ Couldnt register user')
                 await sock.send('{"register":0}')
+                return False
         else: # Loging in user
             userid = self.model.login(ss,lg,pw)
             if userid != -1: # Successful auth
@@ -86,12 +86,14 @@ class GameServer:
             else: # Failed auth
                 GameServer.LOG.info('  /!\\ Couldnt auth user')
                 await sock.send('{"auth":0}') # Failed auth message
+                return False
+        return True
     # Logouts an user
     def logout(self,sock):
         if sock in self.users:
             session = self.users[sock]['session']
             pid = self.users[sock]['id']
-            self.sessions[session].isOffline(pid) # Sets user status to offline
+            self.accessSession(session).isOffline(pid) # Sets user status to offline
             GameServer.LOG.info(' > User {} successfully disconnected from session {}, Bye !'.format(pid,session))
             del self.users[sock] # Deletes user from active users
             # check if session is still active (if there's still players in the session)
@@ -101,10 +103,9 @@ class GameServer:
                     stillActive = True
                     break
             if not stillActive: # Session not active
-                GameServer.LOG.info('= Writing session {} no longer active and written to database'.format(session))
+                GameServer.LOG.info('-=- Session {} no longer active'.format(session))
                 self.model.writeSession(self.sessions[session]) # Write session to db
-                self.activeSessions.remove(session) # Session no longer active
-                GameServer.LOG.info('- Session {} no longer active and written to database'.format(session))
+                GameServer.LOG.info('=-= Session {} no longer active and written to database'.format(session))
                 del self.sessions[session] # Deleting session data
 
     # Game Related
@@ -125,7 +126,6 @@ class GameServer:
             data = json.loads(await sock.recv())
             session = self.users.get(sock,{}).get('session',-1)
             if data.get('load',0) is 1: # Client asked for game to load
-                self.activeSessions.add(session)
                 self.accessSession(session).tick() # Update game if needed
                 self.accessSession(session).isOnline(self.users[sock]['id']) # Sets user status to online
                 clientdata = self.accessSession(session).toLoad(self.users[sock]['id'])

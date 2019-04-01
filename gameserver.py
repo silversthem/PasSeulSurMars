@@ -37,18 +37,16 @@ gameServer = GameServer(DB,LOG,TICKRATE)
 
 # Main Server Feedback Loop
 async def main(sock, path):
-    await gameServer.auth(sock) # Auths new user
-    try:
+    authed = await gameServer.auth(sock) # Auths new user
+    if authed: # User successfully authed
         while True: # Main User Feedback loop
             try:
                 await gameServer.update(sock) # handle update
-            except websockets.exceptions.ConnectionClosed: # Socket closed unexpectedly -> disconnect user
+            except websockets.exceptions.ConnectionClosed: # Socket closed -> disconnect user
                 gameServer.logout(sock)
                 break
             except (KeyboardInterrupt, SystemExit): # Server stopped
                 break # @TODO : handle exit
-    finally: # End of user Feedback loop -> disconnect user
-        gameServer.logout(sock)
 
 # Main Cycle Loop
 async def cycle():
@@ -58,9 +56,6 @@ async def cycle():
             await asyncio.sleep(0.02) # Sleeps for a lil bit to free cpu
         except (KeyboardInterrupt, SystemExit): # Server stopped
             break # @TODO : handle exit
-
-
-
 
 # Server starts running here
 asyncio.get_event_loop().run_until_complete(websockets.serve(main, 'localhost', 55555))

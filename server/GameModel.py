@@ -18,7 +18,8 @@ class GameModel:
 
     # Returns user id, or -1 if no match is found in database
     def login(self,session,login,password):
-        return select(self.db,'SELECT id FROM Player WHERE session = ? AND name = ? AND password = ?',(session,login,password))[0].get('id',-1)
+        r = select(self.db,'SELECT id FROM Player WHERE session = ? AND name = ? AND password = ?',(session,login,password))
+        return -1 if len(r) == 0 else r[0]['id']
     # Creates a new user in db, returns new user as dict
     def newUser(self,session,login,password):
         d = SessionModel.playerDict(session,login,password)
