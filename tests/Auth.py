@@ -12,7 +12,8 @@ testsGrid = [
     {'send':loginValid21,'receive':loginValid21Response,'name':'Login (Session : 2, pid 3)'},
     {'send':registerValid22,'receive':registerValid22Response,'name':'Registration in Session 2 (Session : 2, pid : 4)'},
     {'send':loginValid22,'receive':loginValid22Response,'name':'Login (Session : 2, pid 4)'},
-    {'send':registerWrong2,'receive':registerWrongResponse,'name':'Registration in Session 2 : Username already taken'}
+    # {'send':registerWrong2,'receive':registerWrongResponse,'name':'Registration in Session 2 : Username already taken'}
+    # try to login as an already logged on user
 ]
 
 for test in testsGrid:

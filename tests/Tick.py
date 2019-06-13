@@ -10,7 +10,7 @@ async def testSeq(client,login):
     rep = await client.recv()
     await client.send(dumps(loadCommand))
     loadedGame = loads(await client.recv())
-    return loadedGame
+    # ...
 
 async def testSeq1():
     client1 = await getSocket()

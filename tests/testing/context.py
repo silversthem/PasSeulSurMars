@@ -35,7 +35,7 @@ registerValid22 = {'login':'newUser2','password':'shouldbehashed','register':1,'
 loginValid22Response = {'auth':1,'pid':4}
 registerValid22Response = {'register':1,'session':2,'pid':4}
 
-registerWrong2 = {'login':'newUser2','password':'shouldbehashed','session':2}
+registerWrong2 = {'login':'newUser2','password':'shouldbehashed','session':2,'register':1}
 
 registerWrongResponse = {'register':0}
 
@@ -45,10 +45,13 @@ loadCommand = {'load':1}
 
 # Functions
 
+def getSocket():
+    return websockets.connect('ws://localhost:55555')
+
 def runTestsSequence(dataIn,expectedDataOut):
     r = []
     async def testSequence():
-        async with websockets.connect('ws://localhost:55555') as websocket:
+        async with getSocket() as websocket:
             for i in range(len(dataIn)):
                 await websocket.send(dumps(dataIn[i]))
                 rep = await websocket.recv()

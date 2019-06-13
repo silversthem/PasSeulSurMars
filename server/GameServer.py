@@ -45,7 +45,7 @@ class GameServer:
 
     # Adds user to active users
     def addActiveUser(self,sock,ss,id):
-        self.users[sock] = {'socket':sock,'id':id,'session':ss,'last_update':0}
+        self.users[sock] = {'socket':sock,'id':id,'session':int(ss),'last_update':0}
 
     # Auth Related
 
@@ -91,15 +91,15 @@ class GameServer:
     # Logouts an user
     def logout(self,sock):
         if sock in self.users:
-            session = self.users[sock]['session']
-            pid = self.users[sock]['id']
+            session = int(self.users[sock]['session'])
+            pid = int(self.users[sock]['id'])
             self.accessSession(session).isOffline(pid) # Sets user status to offline
             GameServer.LOG.info(' > User {} successfully disconnected from session {}, Bye !'.format(pid,session))
             del self.users[sock] # Deletes user from active users
             # check if session is still active (if there's still players in the session)
             stillActive = False
             for i in self.users:
-                if self.users[i].get(sock,{}).get('session',-1) == session:
+                if self.users[i].get('session',-1) == session:
                     stillActive = True
                     break
             if not stillActive: # Session not active

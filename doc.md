@@ -4,6 +4,39 @@
 
 # Data
 
+All components of the game (players, ressources, objects, entities) store data in a json object as a field in the database.
+Here's a list of the fields you'll find in each of them.
+
+### Common fields
+
+- `creation`
+- `last_update`
+
+## Players
+
+- `toward` : contains a (x,y) tuple of the direction the player is currently moving toward
+- `inventory`
+  * `items`
+  * `objects`
+- `health`
+- `status`
+  * `oxygen`
+  * `food`
+  * `stamina`
+
+## Ressources
+
+- `quality`
+- `total`
+- `quantity`
+
+## Objects
+
+- `owner`
+...
+
+## Entities
+
 ...
 
 # Paquets

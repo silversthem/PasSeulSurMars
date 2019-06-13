@@ -2,12 +2,152 @@ body, html {
   height: 100%;
 }
 
+/*
+  Left Sidebar
+*/
+
 #actionMenu {
-  height: 100%;
-  width: 20%;
+  height: 100vh;
+  width: 380px;
   border-right: 1px solid grey;
   float: left;
+  background-color: rgba(10,10,10,0.9);
 }
+
+/* Tabs */
+
+.tabs {
+  width: 100%;
+  height: 35px;
+  margin: auto;
+  display: table;
+  margin-bottom: 5px;
+}
+
+.tab {
+  display: table-cell;
+  margin: 0px;
+  border-right: 1px solid grey;
+  border-bottom: 1px solid grey;
+  height: 100%;
+  cursor: pointer;
+  vertical-align: middle;
+  text-align: center;
+}
+
+.tab:first-of-type {
+  border-left: 0px;
+}
+
+.tab:last-of-type {
+  border-right: 0px;
+}
+
+.focusedTab {
+  border-bottom:0px;
+  font-weight: bold;
+}
+
+/* Focused Action */
+
+#focusedActionPanel {
+  background-color: #eee;
+  width: 90%;
+  margin: auto;
+  margin-top: 10px;
+  border-radius: 5px;
+  padding-bottom: 5px;
+}
+
+#focusedActionTitle {
+  float: right;
+  font-weight: bolder;
+  width: 50%;
+  font-size: 1.3em;
+}
+
+#focusedActionDesc {
+  clear: both;
+}
+
+.qualityInfo::before {
+  content: "Quality :";
+  font-weight: bold;
+}
+
+.infoProgressBar {
+  width: 90%;
+  margin: auto;
+}
+
+.infoProgressBarBar {
+  width: 100%;
+}
+
+.infoProgressBarLabel {
+  width: 100%;
+  text-align: center;
+}
+
+/* Other Action Panel */
+
+.groupPanel {
+  border: 1px solid black;
+  width: 90%;
+  margin: 15px;
+  background-color: #eee;
+}
+
+.panelTitle {
+  width: 100%;
+  background-color: rgba(5,5,5,0.8);
+  color: white;
+  font-weight: bold;
+  font-size: 1.2em;
+  padding: 5px 0px 5px 0px;
+  cursor: pointer;
+}
+
+.panelTitle::before {
+  content: "   ";
+  white-space: pre-wrap;
+}
+
+.gridPanelContentElement {
+  display: grid;
+  width: 100%;
+  padding: 5px 0px;
+}
+
+.gridPanelContentElement:hover {
+  background-color: rgba(255,255,255,1);
+  cursor: grab;
+}
+
+.gridPanelContentElementName {
+  grid-column: 1;
+  width: 160px;
+  font-weight: bold;
+}
+
+.gridPanelContentElementName::before {
+  white-space: pre-wrap;
+  content:"   ";
+}
+
+.gridPanelContentElementAmount {
+  grid-column: 2;
+  text-align: right;
+}
+
+.gridPanelContentElementAmount::after {
+  white-space: pre-wrap;
+  content:"   ";
+}
+
+/*
+  Main content
+*/
 
 #mainAction {
   float: right;
@@ -15,20 +155,14 @@ body, html {
   height: 100%;
 }
 
-#playerPanel {
-  position: absolute;
-  top: 0px;
-  right: 100px;
-  border: 1px solid grey;
-  border-top: 0;
-  width: 500px;
-  height: 250px;
-}
-
 #gamePanel {
     margin-top: 60px;
     margin-left: 50px;
     display: grid;
+}
+
+#gameCanvas {
+  border: 1px solid grey;
 }
 
 #coordsPanel, #gameCanvas, #hoverCoordsPanel {
@@ -50,7 +184,36 @@ body, html {
   color: green;
 }
 
-#chatbotPanel {
+/*
+  Player Panel
+*/
+
+#playerPanel {
+  position: absolute;
+  top: 0px;
+  right: 100px;
+  border: 1px solid grey;
+  border-top: 0;
+  width: 500px;
+  height: 250px;
+}
+
+#playerPanelTitle {
+  position: absolute;
+  bottom: 0px;
+  width: 100%;
+  background-color: rgba(5,5,5,0.8);
+  font-size: 1.2em;
+  padding: 5px 0px;
+  font-weight: bold;
+  color: white;
+}
+
+/*
+  Chat Panel
+*/
+
+#chatPanel {
   position: absolute;
   bottom: 0px;
   right: 100px;
@@ -58,4 +221,22 @@ body, html {
   border-bottom: 0;
   width: 500px;
   height: 600px;
+}
+
+#chatTitle {
+  width: 100%;
+  background-color: rgba(5,5,5,0.8);
+  font-size: 1.2em;
+  padding: 5px 0px;
+  font-weight: bold;
+  color: white;
+}
+
+#chatInput {
+  position: absolute;
+  bottom: 0px;
+  width: 496px;
+  height: 50px;
+  border: 0px;
+  border-top: 1px solid grey;
 }

@@ -33,21 +33,52 @@
   <!-- Game UI -->
   <div id="GAME">
     <div id="actionMenu">
-      <div id="focusedActionPanel"></div>
-      <hr/>
-      <div id="otherActionsListPanel"></div>
+      <div id="focusedActionPanel">
+        
+      </div>
+      <div id="otherActionsListPanel">
+        <div class="groupPanel" id="ObjectsPanel">
+          <div class="panelTitle">Objects</div>
+          <div class="tabs">
+            <div class="tab focusedTab">All</div><div class="tab">Power</div><div class="tab">Containers</div><div class="tab">Cables</div>
+          </div>
+        </div>
+        <div class="groupPanel" id="InventoryPanel">
+          <div class="panelTitle">Inventory</div>
+          <div class="tabs">
+            <div class="tab focusedTab">All</div><div class="tab">...</div>
+          </div>
+        </div>
+      </div>
     </div>
     <div id="mainAction">
       <div id="playerPanel">
-        <p>player info</p>
+        <div class="statusProgressBar">
+          <div class="statusProgressBarLabel">Health</div>
+          <progress class="statusProgressBarBar" value="100" max="100">100%</progress>
+        </div>
+        <div class="statusProgressBar">
+          <div class="statusProgressBarLabel">Oxygen</div>
+          <progress class="statusProgressBarBar" value="100" max="100">100%</progress>
+        </div>
+        <div class="statusProgressBar">
+          <div class="statusProgressBarLabel">Stamina</div>
+          <progress class="statusProgressBarBar" value="100" max="100">100%</progress>
+        </div>
+        <div id="playerPanelTitle">Player Name</div>
       </div>
       <div id="gamePanel">
         <canvas id="gameCanvas"></canvas>
         <p id="coordsPanel">(? ; ?)</p>
         <p id="hoverCoordsPanel">(? ; ?)</p>
       </div>
-      <div id="chatbotPanel">
-        <p>chatbot</p>
+      <div id="chatPanel">
+        <div id="chatTitle">Chat</div>
+        <div class="tabs">
+          <div class="tab">Chat</div><div class="tab focusedTab">Radio</div><div class="tab">Companion</div>
+        </div>
+        <div id="chatContent"></div>
+        <textarea type="text" placeholder="> Chat here" name="chatInput" id="chatInput"></textarea>
       </div>
     </div>
   </div>

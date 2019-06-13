@@ -29,7 +29,7 @@ def getRandomQuality(interval, f = (lambda x : x**3)):
     return interval[0]
 
 # Returns a dict of (x,y,type,data) for a dictionnary containing the list of all the ressources
-def generateRessources(bounds,ressourcesDict):
+def generateRessources(bounds,ressourcesDict,creationStamp):
     r = []
     d = int(sqrt(sum([sum([c**2 for c in p]) for p in bounds])))
     for rs in ressourcesDict:
@@ -37,7 +37,11 @@ def generateRessources(bounds,ressourcesDict):
         n = int(d*ressource.get('density',1)) # Amount of the ressource to display
         for k in range(n):
             x,y = getRandomCoords(bounds,r)
-            data = {'quality':getRandomQuality(ressource.get('quality',[1,1])),
-                    'total'  :randrange(*ressource.get('quantity',[0,0]))}
+            total = randrange(*ressource.get('quantity',[0,0]))
+            data = {'quality' :getRandomQuality(ressource.get('quality',[1,1])),
+                    'total'   :total,
+                    'quantity':total,
+                    'creation':creationStamp,
+                    'last_update':creationStamp}
             r.append({'x':x,'y':y,'type':rs,'data':data})
     return r

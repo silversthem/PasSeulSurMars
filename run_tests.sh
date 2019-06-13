@@ -11,8 +11,9 @@ test_file () {
 }
 
 test_file Auth
-test_file Load
-test_file Actions
+# test_file Load
+# test_file Actions
+test_file Tick
 
 echo ""
 echo "+--------------------+"

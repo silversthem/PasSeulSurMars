@@ -3,6 +3,9 @@
 from time import time
 from .game.map import generateMap,generateRessources
 
+def timestamp():
+    return time() * 1000
+
 class SessionModel:
     GameEnv = {} # Contains all game elements, loaded from assets/config at runtime in GameServer
     PeriodicWriting = 100 # Data will be written to database every 100th cycle
@@ -31,7 +34,7 @@ class SessionModel:
     # Generates new session data, at the creation of a new session
     def generate(self):
         # Generates ressources on the map
-        self.ressources = generateRessources([(-100,-100),(100,100)],SessionModel.GameEnv.get('ressources',{})) 
+        self.ressources = generateRessources([(-100,-100),(100,100)],SessionModel.GameEnv.get('ressources',{}),timestamp())
 
     # Players Related
 
@@ -43,8 +46,13 @@ class SessionModel:
         return {}
     # Adds new player to session
     def insertNewPlayer(self,user):
-        # @TODO : Give player starter kit
-        # @TODO : init player data right
+        # Give player starter kit
+        user['data']['inventory'] = SessionModel.GameEnv.get('starter')
+        # init player data
+        user['data']['creation'] = timestamp()
+        user['data']['last_update'] = user['data']['creation']
+        user['data']['health'] = 100
+        user['data']['status'] = {'oxygen':100,'food':100,'stamina':100}
         self.players.append(user)
     # Sets player as server admin
     def setAdmin(self,userid):
@@ -71,19 +79,22 @@ class SessionModel:
     def toTick(self,userid,userlastupdate):
         if userlastupdate < self.session['last_update']: # User needs an update
             data = {}
-            # @TODO : update players, objects and entities
+            # return changed elements since user last user update
+            data['players']    = [player for player in self.players if player['data']['last_update'] > userlastupdate]
+            data['ressources'] = [rs for rs in self.ressources if rs['data']['last_update'] > userlastupdate]
+            data['objects']    = [object for object in self.objects if object['data']['last_update'] > userlastupdate]
             return (self.session['last_update'],data) # return updated user data
         return (userlastupdate,None) # User's already updated
     # Updates the session by one or more cycles, depending on last update registered in self.session['last_update']
     def tick(self):
-        t = time() * 1000
+        t = timestamp()
         if self.session['last_update'] == 0:
             self.session['last_update'] = t
         elif self.session['last_update'] < t:
             dt = t - self.session['last_update']
             if dt >= SessionModel.TickTime:
                 ticks = (dt - (dt % SessionModel.TickTime))/SessionModel.TickTime
-                # @TODO : Update game by x ticks
+                # Update game by n ticks
                 self.session['last_update'] = t
 
     # Updates the session by a command, and returns update status and changes to client
